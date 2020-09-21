@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace Dwapi.Auth
 {
@@ -17,17 +18,11 @@ namespace Dwapi.Auth
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                // uncomment to write to Azure diagnostics stream
-                //.WriteTo.File(
-                //    @"D:\home\LogFiles\Application\identityserver.txt",
-                //    fileSizeLimitBytes: 1_000_000,
-                //    rollOnFileSizeLimit: true,
-                //    shared: true,
-                //    flushToDiskInterval: TimeSpan.FromSeconds(1))
+                .WriteTo.File(@"logs/auth.log", LogEventLevel.Error)
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
 
@@ -52,8 +47,16 @@ namespace Dwapi.Auth
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseConfiguration(GetConfig(args));
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseSerilog();
                 });
+
+        private static IConfigurationRoot GetConfig(string[] args)
+        {
+            return new ConfigurationBuilder()
+                .AddJsonFile("hosting.json", optional: true)
+                .AddCommandLine(args).Build();
+        }
     }
 }

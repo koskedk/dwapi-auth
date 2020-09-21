@@ -57,6 +57,7 @@ namespace Dwapi.Auth
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHsts();
             // uncomment if you want to add MVC
             //app.UseStaticFiles();
             //app.UseRouting();

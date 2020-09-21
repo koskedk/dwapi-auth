@@ -18,7 +18,7 @@ namespace Dwapi.Auth
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
             {
-                new ApiResource("pdapiv1","DWH Palantir Dataset API"),
+                new ApiResource("c","DWH Palantir Dataset API"),
             };
 
         public static IEnumerable<Client> Clients(string secret) =>
@@ -38,7 +38,7 @@ namespace Dwapi.Auth
                     },
 
                     // scopes that client has access to
-                    AllowedScopes = { "api1" }
+                    AllowedScopes = { "pdapiv1" }
                 }
             };
 

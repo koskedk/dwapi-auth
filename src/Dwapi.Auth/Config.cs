@@ -21,12 +21,15 @@ namespace Dwapi.Auth
                 new ApiResource("pdapiv1","DWH Palantir Dataset API"),
             };
 
-        public static IEnumerable<Client> Clients(string secret) =>
-            new Client[]
+        public static IEnumerable<Client> Clients(ApiClient[] apiClients)
+        {
+            var clients = new List<Client>();
+
+            foreach (var apiClient in apiClients)
             {
-                new Client
+                var client = new Client
                 {
-                    ClientId = "palantir",
+                    ClientId =apiClient.Name,
 
                     // no interactive user, use the clientid/secret for authentication
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
@@ -34,13 +37,17 @@ namespace Dwapi.Auth
                     // secret for authentication
                     ClientSecrets =
                     {
-                        new Secret(secret.Sha256())
+                        new Secret(apiClient.Key.Sha256())
                     },
 
                     // scopes that client has access to
-                    AllowedScopes = { "pdapiv1" }
-                }
-            };
+                    AllowedScopes =apiClient.Scope.Split(',')
+                };
+                clients.Add(client);
+            }
+            return clients;
+        }
+
 
     }
 }

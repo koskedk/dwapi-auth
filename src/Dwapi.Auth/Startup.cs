@@ -13,31 +13,26 @@ namespace Dwapi.Auth
     public class Startup
     {
         public IWebHostEnvironment Environment { get; }
-        public IConfiguration Configuration { get; }
-
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(environment.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
             Environment = environment;
             Configuration = builder.Build();
         }
-
+        public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            // uncomment, if you want to add an MVC-based UI
-            //services.AddControllersWithViews();
-
-            var secret = Configuration["Secret"];
+            var clients = Configuration.GetSection("Clients").Get<ApiClient[]>();
 
             var builder = services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.Ids)
                 .AddInMemoryApiResources(Config.Apis)
-                .AddInMemoryClients(Config.Clients(secret));
+                .AddInMemoryClients(Config.Clients(clients));
 
             if (Environment.IsDevelopment())
             {
@@ -57,7 +52,7 @@ namespace Dwapi.Auth
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHsts();
+            // app.UseHsts();
             // uncomment if you want to add MVC
             //app.UseStaticFiles();
             //app.UseRouting();

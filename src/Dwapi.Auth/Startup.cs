@@ -31,7 +31,8 @@ namespace Dwapi.Auth
 
             var builder = services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.Ids)
-                .AddInMemoryApiResources(Config.Apis)
+                .AddInMemoryApiScopes(Configuration.GetSection("ApiScopes"))
+                .AddInMemoryApiResources(Configuration.GetSection("ApiScopes"))
                 .AddInMemoryClients(Config.Clients(clients));
 
             if (Environment.IsDevelopment())
